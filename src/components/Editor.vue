@@ -1,40 +1,46 @@
 <template>
     <div>
-      <p v-for="(id, index) in formattedIds" :key="index">
-        {{ id.body }} id:{{ id.id }} type:{{ id.type }}
-      </p>
+        <p v-for="(body in this.formatted">
+            {{ body }}
+        </p>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        ids: [],
-        format: []
-      };
-    },
-    computed: {
-      formattedIds() {
-        return this.format.map(id => {
-          return this.ids.find(i => i.id === id);
-        });
-      }
-    },
-    created() {
-      Promise.all([
-        fetch("/ids.json")
-          .then(response => response.json())
-          .then(data => {
-            this.ids = data;
-          }),
-        fetch("/format.json")
-          .then(response => response.json())
-          .then(data => {
-            this.format = data;
-          })
-      ]);
+</template>
+
+
+<script>
+export default {
+data() {
+    return {
+        elements: [],
+        formatted: []
+    };
+},
+methods: {
+    iterateFormat(json, iteration) {
+        for (var object of json) {
+            var element = this.elements.find(o => o.id == object.id)
+            var body = element.body
+            this.formatted.push('>'.repeat(iteration) + body)
+
+            if (object.children.length == 0) continue
+
+            this.iterateFormat(object.children, iteration + 1)
+        }
     }
-  };
-  </script>
-  
+},
+created() {
+    Promise.all([
+        fetch("/ids.json")
+            .then(response => response.json())
+            .then(data => {
+                this.elements = data
+            }),
+        fetch("/format.json")
+            .then(response => response.json())
+            .then(data => {
+                this.iterateFormat(data, 0)
+            })
+    ])
+},
+}
+</script>
