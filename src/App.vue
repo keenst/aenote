@@ -12,5 +12,5 @@ import HelloWorld from './components/HelloWorld.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue"/>
-  <p class="text-3xl">test</p>
+  <p class="text-3xl">test adasdafiasndana</p>
 </template>
