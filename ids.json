@@ -1,17 +1,17 @@
 [
-    {
-      "id": 0,
-      "type": "heading",
-      "body": "hello"
-    },
-    {
-      "id": 1,
-      "type": "title",
-      "body": "pencil"
-    },
-    {
-      "id": 2,
-      "type": "text",
-      "body": "woah"
-    }
-  ]
+  {
+    "id": 0,
+    "type": "heading",
+    "body": "hello"
+  },
+  {
+    "id": 1,
+    "type": "title",
+    "body": "pencil"
+  },
+  {
+    "id": 2,
+    "type": "text",
+    "body": "woah"
+  }
+]
