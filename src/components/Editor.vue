@@ -1,6 +1,9 @@
 <template>
+  <div class="bg-red-500">
+    <p>this should have a red background</p>
+  </div>
     <div>
-        <p v-for="(body in this.formatted">
+        <p v-for="body in this.formatted">
             {{ body }}
         </p>
     </div>
