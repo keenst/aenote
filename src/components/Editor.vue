@@ -2,6 +2,9 @@
   <div class="bg-red-500">
     <p>this should have a red background</p>
   </div>
+  <div class="bg-ae-grey-300">
+    <p>this should have a grey background</p>
+  </div>
     <div>
         <p v-for="body in this.formatted">
             {{ body }}

@@ -6,7 +6,7 @@
 
 <script>
 import Editor from "./components/Editor.vue";
-import "./assets/css/tailwind.css";
+import "./style.css";
 
 export default {
   components: {
