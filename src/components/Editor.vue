@@ -1,6 +1,6 @@
 <template>
   <div>
-    <element 
+    <RecursiveElement 
       v-model:elements="this.elements" 
       :depth="0" 
       :format="this.format" 
@@ -11,36 +11,36 @@
 </template>
 
 <script>
-import element from './Element.vue'
+import RecursiveElement from './RecursiveElement.vue'
 
 export default {
-data() {
-  return {
-    elements: [],
-    format: []
-  };
-},
-components: {
-  element
-},
-methods: {
-  log() {
-    console.log(this.elements)
-  }
-},
-created() {
-  Promise.all([
-    fetch("/ids.json")
-      .then(response => response.json())
-      .then(data => {
-        this.elements = data
-      }),
-    fetch("/format.json")
-      .then(response => response.json())
-      .then(data => {
-        this.format = data
-      })
-  ])
-},
+  data() {
+    return {
+      elements: [],
+      format: []
+    };
+  },
+  components: {
+    RecursiveElement
+  },
+  methods: {
+    log() {
+      console.log(this.elements)
+    }
+  },
+  created() {
+    Promise.all([
+      fetch("/ids.json")
+        .then(response => response.json())
+        .then(data => {
+          this.elements = data
+        }),
+      fetch("/format.json")
+        .then(response => response.json())
+        .then(data => {
+          this.format = data
+        })
+    ])
+  },
 }
 </script>
