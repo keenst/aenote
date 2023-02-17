@@ -1,46 +1,46 @@
 <template>
-    <div>
-        <p v-for="(body in this.formatted">
-            {{ body }}
-        </p>
-    </div>
+  <div>
+    <element 
+      v-model:elements="this.elements" 
+      :depth="0" 
+      :format="this.format" 
+      :parent="0" 
+    />
+    <button @click="log()">Log</button>
+  </div>
 </template>
 
-
 <script>
+import element from './Element.vue'
+
 export default {
 data() {
-    return {
-        elements: [],
-        formatted: []
-    };
+  return {
+    elements: [],
+    format: []
+  };
+},
+components: {
+  element
 },
 methods: {
-    iterateFormat(json, iteration) {
-        for (var object of json) {
-            var element = this.elements.find(o => o.id == object.id)
-            var body = element.body
-            this.formatted.push('>'.repeat(iteration) + body)
-
-            if (object.children.length == 0) continue
-
-            this.iterateFormat(object.children, iteration + 1)
-        }
-    }
+  log() {
+    console.log(this.elements)
+  }
 },
 created() {
-    Promise.all([
-        fetch("/ids.json")
-            .then(response => response.json())
-            .then(data => {
-                this.elements = data
-            }),
-        fetch("/format.json")
-            .then(response => response.json())
-            .then(data => {
-                this.iterateFormat(data, 0)
-            })
-    ])
+  Promise.all([
+    fetch("/ids.json")
+      .then(response => response.json())
+      .then(data => {
+        this.elements = data
+      }),
+    fetch("/format.json")
+      .then(response => response.json())
+      .then(data => {
+        this.format = data
+      })
+  ])
 },
 }
 </script>
