@@ -1,70 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Indentation Text Editor</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-</head>
-<body>
-    <div id="app">
-        <textarea v-model="text" @input="updateIndentation"></textarea>
-    </div>
-
-    <script>
-        interface Line {
-            text: string;
-            indent: number;
-            children: Line[];
-        }
-
-        const INDENT_SIZE = 4;
-
-        const app = new Vue({
-            el: '#app',
-            data: {
-                text: '',
-                lines: [] as Line[]
-            },
-            methods: {
-                updateIndentation() {
-                    this.lines = this.parseLines(this.text);
-                },
-                parseLines(text: string): Line[] {
-                    const lines = text.split('\n');
-                    let currentIndent = 0;
-                    const stack: Line[] = [];
-
-                    for (const line of lines) {
-                        const trimmed = line.trimLeft();
-
-                        if (!trimmed) {
-                            // Empty line
-                            continue;
-                        }
-
-                        const indent = line.length - trimmed.length;
-                        if (indent > currentIndent + INDENT_SIZE) {
-                            // Invalid indentation, skip this line
-                            continue;
-                        }
-
-                        currentIndent = indent;
-                        const parent = stack[indent / INDENT_SIZE] || null;
-                        const newLine = { text: trimmed, indent, children: [] };
-                        stack[indent / INDENT_SIZE] = newLine;
-
-                        if (parent) {
-                            parent.children.push(newLine);
-                        } else {
-                            // No parent, add as root
-                            stack.push(newLine);
-                        }
-                    }
-
-                    return stack;
-                }
-            }
-        });
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + Vue + TS</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
