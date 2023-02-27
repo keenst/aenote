@@ -34,8 +34,13 @@ export default defineComponent({
         const newLineStart = beforeCursor.lastIndexOf('\n') + 1;
         const newLineEnd = beforeCursor.substring(newLineStart).search(/\S/) + newLineStart;
         const indent = ' '.repeat(4);
-        this.text = `${beforeCursor.substring(0, newLineEnd)}${indent}${beforeCursor.substring(newLineEnd)}${afterCursor}`;
-        textarea.setSelectionRange(start + 4, start + 4);
+        if (newLineEnd === newLineStart - 1) {
+          this.text = `${beforeCursor}${indent}${afterCursor}`;
+          textarea.setSelectionRange(start + 4, start + 4);
+        } else {
+          this.text = `${beforeCursor.substring(0, newLineEnd)}${indent}${beforeCursor.substring(newLineEnd)}${afterCursor}`;
+          textarea.setSelectionRange(start + 4, start + 4);
+        }
       }
       // If text is selected, indent each line of the selection
       else {
