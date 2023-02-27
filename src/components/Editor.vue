@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
     <div class="w-1/4 border-r border-gray-700">
-      <div class="p-4">Sidebar Content</div>
-      <div class="p-4">Sidebar Content</div>
-      <div class="p-4">Sidebar Content</div>
+      <div class="p-4">thing1</div>
+      <div class="p-4">thing2</div>
+      <div class="p-4">thing3</div>
     </div>
     <div class="flex-grow flex flex-col justify-center items-center">
       <textarea class="w-1/2 h-64 px-4 py-2 rounded-md bg-gray-800 text-gray-100 focus:outline-none" v-model="text" @keydown.tab.prevent="indentLine"></textarea>
@@ -26,7 +26,6 @@ export default defineComponent({
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
 
-      // If no text is selected, insert four spaces at the start of the line
       if (start === end) {
         const value = this.text;
         const beforeCursor = value.substring(0, start);
@@ -42,7 +41,6 @@ export default defineComponent({
           textarea.setSelectionRange(start + 4, start + 4);
         }
       }
-      // If text is selected, indent each line of the selection
       else {
         const value = this.text;
         const lines = value.substring(start, end).split('\n');
