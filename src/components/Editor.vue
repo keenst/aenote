@@ -1,9 +1,15 @@
 <template>
   <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
     <div class="w-1/6 border-r border-gray-700">
-      <div class="p-4">Editor</div>
-      <div class="p-4">page 1</div>
-      <div class="p-4">page 2</div>
+      <div class="p-4">
+        <router-link to="/editor">Editor</router-link>
+      </div>
+      <div class="p-4">
+        <router-link to="/page1">Page 1</router-link>
+      </div>
+      <div class="p-4">
+        <router-link to="/page2">Page 2</router-link>
+      </div>
     </div>
     <div class="flex-grow flex flex-col justify-center items-center">
       <textarea class="w-3/5 h-3/5 px-4 py-2 rounded-md bg-gray-900 text-gray-100 focus:outline-none" 
