@@ -1,12 +1,14 @@
 <template>
   <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
-    <div class="w-1/4 border-r border-gray-700">
-      <div class="p-4">thing1</div>
-      <div class="p-4">thing2</div>
-      <div class="p-4">thing3</div>
+    <div class="w-1/6 border-r border-gray-700">
+      <div class="p-4">Editor</div>
+      <div class="p-4">page 1</div>
+      <div class="p-4">page 2</div>
     </div>
     <div class="flex-grow flex flex-col justify-center items-center">
-      <textarea class="w-1/2 h-64 px-4 py-2 rounded-md bg-gray-800 text-gray-100 focus:outline-none" v-model="text" @keydown.tab.prevent="indentLine"></textarea>
+      <textarea class="w-3/5 h-3/5 px-4 py-2 rounded-md bg-gray-900 text-gray-100 focus:outline-none" 
+      v-model="text" @keydown.tab.prevent="indentLine"
+      ></textarea>
     </div>
   </div>
 </template>
@@ -34,17 +36,24 @@ export default defineComponent({
         const newLineEnd = beforeCursor.substring(newLineStart).search(/\S/) + newLineStart;
         const indent = ' '.repeat(4);
         if (newLineEnd === newLineStart - 1) {
-          this.text = `${beforeCursor}${indent}${afterCursor}`;
+          this.text = `${beforeCursor}${indent}• ${afterCursor}`;
           textarea.setSelectionRange(start + 4, start + 4);
         } else {
-          this.text = `${beforeCursor.substring(0, newLineEnd)}${indent}${beforeCursor.substring(newLineEnd)}${afterCursor}`;
+          const currentLine = beforeCursor.substring(newLineEnd);
+          const isIndented = currentLine.startsWith('•');
+          const newLine = `${indent}${isIndented ? '' : '•'}${currentLine.trim()}`;
+          this.text = `${beforeCursor.substring(0, newLineEnd)}${newLine}${afterCursor}`;
           textarea.setSelectionRange(start + 4, start + 4);
         }
       }
       else {
         const value = this.text;
         const lines = value.substring(start, end).split('\n');
-        const newLines = lines.map(line => `    ${line}`);
+        const newLines = lines.map(line => {
+          const isIndented = line.startsWith('•');
+          const newLine = `${' '.repeat(4)}${isIndented ? line.substring(2).trim() : `•${line.trim()}`}`;
+          return newLine;
+        });
         const newValue = `${value.substring(0, start)}${newLines.join('\n')}${value.substring(end)}`;
         this.text = newValue;
         const newStart = start + 4;
