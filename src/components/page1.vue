@@ -1,23 +1,29 @@
 <template>
-    <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
-      <div class="w-1/6 border-r border-gray-700">
-        <div class="p-4">
-          <router-link to="/editor">Editor</router-link>
-        </div>
-        <div class="p-4">
-          <router-link to="/page1">Page 1</router-link>
-        </div>
-        <div class="p-4">
-          <router-link to="/page2">Page 2</router-link>
-        </div>
+  <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
+    <div class="w-1/6 border-r border-gray-700">
+      <div 
+      @click="$router.push('/editor')" 
+      class="p-2 m-2 hover:bg-gray-800 rounded-md cursor-pointer">
+        Editor
       </div>
-      <div class="flex-grow flex flex-col justify-center items-center">
-        <textarea class="w-3/5 h-3/5 px-4 py-2 rounded-md bg-gray-900 text-gray-100 focus:outline-none" 
-        v-model="text" @keydown.tab.prevent="indentLine"
-        ></textarea>
+      <div 
+      @click="$router.push('/page1')" 
+      class="p-2 m-2 bg-gray-700 rounded-md cursor-pointer">
+        Page 1
+      </div>
+      <div 
+      @click="$router.push('/page2')" 
+      class="p-2 m-2 hover:bg-gray-800 rounded-md cursor-pointer">
+        Page 2
       </div>
     </div>
-  </template>
+    <div class="flex-grow flex flex-col justify-center items-center">
+      <textarea class="w-3/5 h-3/5 px-4 py-2 rounded-md bg-gray-900 text-gray-100 focus:outline-none" 
+      v-model="text" @keydown.tab.prevent="indentLine"
+      ></textarea>
+    </div>
+  </div>
+</template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';

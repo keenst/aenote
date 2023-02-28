@@ -1,14 +1,20 @@
 <template>
   <div class="flex flex-row h-screen bg-gray-900 text-gray-100">
     <div class="w-1/6 border-r border-gray-700">
-      <div class="p-4">
-        <router-link to="/editor">Editor</router-link>
+      <div 
+      @click="$router.push('/editor')" 
+      class="p-2 m-2 bg-gray-700 rounded-md cursor-pointer">
+        Editor
       </div>
-      <div class="p-4">
-        <router-link to="/page1">Page 1</router-link>
+      <div 
+      @click="$router.push('/page1')" 
+      class="p-2 m-2 hover:bg-gray-800 rounded-md cursor-pointer">
+        Page 1
       </div>
-      <div class="p-4">
-        <router-link to="/page2">Page 2</router-link>
+      <div 
+      @click="$router.push('/page2')" 
+      class="p-2 m-2 hover:bg-gray-800 rounded-md cursor-pointer">
+        Page 2
       </div>
     </div>
     <div class="flex-grow flex flex-col justify-center items-center">

@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <IndentedTextArea v-model="text"></IndentedTextArea>
-  </div>
+  <RouterView/>
 </template>
 
 <script lang="ts">
