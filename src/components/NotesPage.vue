@@ -8,7 +8,7 @@
       @keydown.up.prevent="focusPreviousTextbox(index)"
       @keydown.tab.prevent="indentTextbox(index, 20, $event)"
       @keydown.backspace="unindentTextbox(index, $event)"
-      :style="{ marginLeft: input.indentation + 'px' }"
+      :style="{ marginLeft: indentations[index] + 'px' }"
       ref="inputElements"
     >
   </div>
@@ -18,7 +18,8 @@
 export default {
   data() {
     return {
-      inputs: [{ value: "", indentation: 0 }],
+      inputs: [{ value: "" }],
+      indentations: [0],
     };
   },
   methods: {
@@ -28,58 +29,52 @@ export default {
       // split text into two parts at cursor position
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
-      // Update the current input value to the first part
+      // get current margin value of focused input
+      const currentIndentation = this.indentations[index];
+      // Update current input value to the part
       this.inputs[index].value = firstPart;
       // insert new input after current one with second part as value
       this.inputs.splice(index + 1, 0, { value: secondPart });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
       newInputElement.focus();
-      // set the cursor to start of new element after the component has finished updating
+      // set cursor to start of new element after component has finished updating (janky jank jank)
       setTimeout(() => {
         newInputElement.selectionStart = 0;
         newInputElement.selectionEnd = 0;
       }, 0);
+      // set the same indentation as focused input
+      this.indentations.splice(index + 1, 0, currentIndentation);
       // indent 20px if tab 
       if (event.keyCode === 9) {
-        newInputElement.style.marginLeft = "20px";
+        this.indentations[index + 1] = currentIndentation + 20;
       }
     },
-
     focusNextTextbox(index) {
       if (index < this.inputs.length - 1) {
         const nextInputElement = this.$refs.inputElements[index + 1];
         nextInputElement.focus();
       }
     },
-
     focusPreviousTextbox(index) {
       if (index > 0) {
         const previousInputElement = this.$refs.inputElements[index - 1];
         previousInputElement.focus();
       }
     },
-
     indentTextbox(index, pixels, event) {
-      const inputElement = this.$refs.inputElements[index];
-      const currentMarginLeft = parseInt(inputElement.style.marginLeft) || 0;
-      const indentationLevel = currentMarginLeft / pixels;
-      const previousInputElement = this.$refs.inputElements[index - 1];
-      const previousMarginLeft = parseInt(previousInputElement.style.marginLeft) || 0;
-      const previousIndentationLevel = previousMarginLeft / pixels;
+      const currentIndentation = this.indentations[index];
+      const previousIndentation = this.indentations[index - 1];
       // indent 20px if tab 
-      if (indentationLevel < previousIndentationLevel + 1) {
-        inputElement.style.marginLeft = `${currentMarginLeft + pixels}px`;
+      if (currentIndentation <= previousIndentation + pixels) {
+        this.indentations[index] = previousIndentation + pixels;
       }
       event.preventDefault();
     },
-
     unindentTextbox(index, event) {
-      const inputElement = this.$refs.inputElements[index];
-      const currentMarginLeft = parseInt(inputElement.style.marginLeft) || 0;
-
-      if (event.keyCode === 8 && currentMarginLeft > 0 && inputElement.selectionStart === 0) {
-        inputElement.style.marginLeft = `${currentMarginLeft - 20}px`;
+      const currentIndentation = this.indentations[index];
+      if (event.keyCode === 8 && currentIndentation > 0 && this.$refs.inputElements[index].selectionStart === 0) {
+        this.indentations[index] = currentIndentation - 20;
       }
     },
   },
