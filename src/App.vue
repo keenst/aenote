@@ -1,28 +1,16 @@
 <template>
-  <div>
-    <IndentedTextArea v-model="text"></IndentedTextArea>
+  <div class="container mx-auto p-4">
+    <NotesPage />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import IndentedTextArea from './components/Editor.vue';
+<script>
+import NotesPage from './components/NotesPage.vue'
 
-export default defineComponent({
+export default {
   name: 'App',
-
   components: {
-    IndentedTextArea,
-  },
-
-  setup() {
-    const text = ref('');
-
-    return {
-      text,
-    };
+    NotesPage
   }
-});
+}
 </script>
-
-
