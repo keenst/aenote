@@ -29,11 +29,8 @@ export default {
       // split text into two parts at cursor position
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
-      // get current margin value of focused input
       const currentIndentation = this.indentations[index];
-      // Update current input value to the part
       this.inputs[index].value = firstPart;
-      // insert new input after current one with second part as value
       this.inputs.splice(index + 1, 0, { value: secondPart });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
@@ -43,7 +40,7 @@ export default {
         newInputElement.selectionStart = 0;
         newInputElement.selectionEnd = 0;
       }, 0);
-      // set the same indentation as focused input
+      // set the same indentation as the focused input
       this.indentations.splice(index + 1, 0, currentIndentation);
       // indent 20px if tab 
       if (event.keyCode === 9) {
@@ -65,16 +62,23 @@ export default {
     indentTextbox(index, pixels, event) {
       const currentIndentation = this.indentations[index];
       const previousIndentation = this.indentations[index - 1];
-      // indent 20px if tab 
-      if (currentIndentation <= previousIndentation + pixels) {
-        this.indentations[index] = previousIndentation + pixels;
+      // check if tab pressed and current indentation is less than maximum
+      if (event.keyCode === 9 && currentIndentation < previousIndentation + pixels) {
+        // increase indentation by 20px
+        this.indentations[index] = currentIndentation + 20;
       }
-      event.preventDefault();
     },
     unindentTextbox(index, event) {
       const currentIndentation = this.indentations[index];
+
       if (event.keyCode === 8 && currentIndentation > 0 && this.$refs.inputElements[index].selectionStart === 0) {
         this.indentations[index] = currentIndentation - 20;
+        let nextIndex = index + 1;
+        // loop through nextindex until it is same or less than current indentation, then unindent all of them
+        while (nextIndex < this.indentations.length && this.indentations[nextIndex] > currentIndentation) {
+          this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
+          nextIndex++;
+        }
       }
     },
   },
