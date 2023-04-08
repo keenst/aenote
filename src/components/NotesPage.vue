@@ -8,6 +8,7 @@
       @keydown.up.prevent="focusPreviousTextbox(index)"
       @keydown.tab.prevent="indentTextbox(index, 20, $event)"
       @keydown.backspace="unindentTextbox(index, $event)"
+      @focus="newTextboxOnFocus(index)"
       :style="{ marginLeft: indentations[index] + 'px' }"
       ref="inputElements"
     >
@@ -79,6 +80,12 @@ export default {
           this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
           nextIndex++;
         }
+      }
+    },
+    newTextboxOnFocus(index) {
+      if (index === this.inputs.length - 1) {
+        this.inputs.push({ value: "" });
+        this.indentations.push(0);
       }
     },
   },
