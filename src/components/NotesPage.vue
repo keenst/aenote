@@ -72,6 +72,7 @@ export default {
     },
     unindentTextboxOnBackspace(index, event) {
       const currentIndentation = this.indentations[index];
+      // checks if start of textbox
       if (event.keyCode === 8 && currentIndentation > 0 && this.$refs.inputElements[index].selectionStart === 0) {
         this.indentations[index] = currentIndentation - 20;
         let nextIndex = index + 1;
@@ -84,7 +85,6 @@ export default {
     },
     unindentTextboxOnShiftTab(index, event) {
       const currentIndentation = this.indentations[index];
-
       if (event.keyCode === 9 && event.shiftKey && currentIndentation > 0) {
         this.indentations[index] = currentIndentation - 20;
         let nextIndex = index + 1;
