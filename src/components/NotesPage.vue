@@ -7,7 +7,8 @@
       @keydown.down.prevent="focusNextTextbox(index)"
       @keydown.up.prevent="focusPreviousTextbox(index)"
       @keydown.tab.prevent="indentTextbox(index, 20, $event)"
-      @keydown.backspace="unindentTextbox(index, $event)"
+      @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
+      @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
       @focus="newTextboxOnFocus(index)"
       :style="{ marginLeft: indentations[index] + 'px' }"
       ref="inputElements"
@@ -63,19 +64,30 @@ export default {
     indentTextbox(index, pixels, event) {
       const currentIndentation = this.indentations[index];
       const previousIndentation = this.indentations[index - 1];
-      // check if tab pressed and current indentation is less than maximum
-      if (event.keyCode === 9 && currentIndentation < previousIndentation + pixels) {
+      // check if tab pressed and current indentation is less than maximum and shift is not pressed
+      if (event.keyCode === 9 && !event.shiftKey && currentIndentation < previousIndentation + pixels) {
         // increase indentation by 20px
         this.indentations[index] = currentIndentation + 20;
       }
     },
-    unindentTextbox(index, event) {
+    unindentTextboxOnBackspace(index, event) {
       const currentIndentation = this.indentations[index];
-
       if (event.keyCode === 8 && currentIndentation > 0 && this.$refs.inputElements[index].selectionStart === 0) {
         this.indentations[index] = currentIndentation - 20;
         let nextIndex = index + 1;
         // loop through nextindex until it is same or less than current indentation, then unindent all of them
+        while (nextIndex < this.indentations.length && this.indentations[nextIndex] > currentIndentation) {
+          this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
+          nextIndex++;
+        }
+      }
+    },
+    unindentTextboxOnShiftTab(index, event) {
+      const currentIndentation = this.indentations[index];
+
+      if (event.keyCode === 9 && event.shiftKey && currentIndentation > 0) {
+        this.indentations[index] = currentIndentation - 20;
+        let nextIndex = index + 1;
         while (nextIndex < this.indentations.length && this.indentations[nextIndex] > currentIndentation) {
           this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
           nextIndex++;
