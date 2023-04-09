@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <NotesPage />
+    <NotesPage/>
   </div>
 </template>
 

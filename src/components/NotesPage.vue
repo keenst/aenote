@@ -1,20 +1,24 @@
 <template>
-  <div v-for="(input, index) in inputs" :key="index">
-    <input
-      type="text"
-      v-model="input.value"
-      @keydown.enter.prevent="createNewTextbox(index, $event)"
-      @keydown.down.prevent="focusNextTextbox(index)"
-      @keydown.up.prevent="focusPreviousTextbox(index)"
-      @keydown.tab.prevent="indentTextbox(index, 20, $event)"
-      @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
-      @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
-      @focus="newTextboxOnFocus(index)"
-      :style="{ marginLeft: indentations[index] + 'px' }"
-      ref="inputElements"
-    >
+  <div class="bg-gray-800 text-cyan-200"> fasfasf
+    <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
+      <input
+        type="text"
+        v-model="input.value"
+        @keydown.enter.prevent="createNewTextbox(index, $event)"
+        @keydown.down.prevent="focusNextTextbox(index)"
+        @keydown.up.prevent="focusPreviousTextbox(index)"
+        @keydown.tab.prevent="indentTextbox(index, 20, $event)"
+        @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
+        @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
+        @focus="newTextboxOnFocus(index)"
+        :style="{ marginLeft: indentations[index] + 'px' }"
+        ref="inputElements"
+        class="bg-gray-100"
+      >
+    </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -61,6 +65,17 @@ export default {
         previousInputElement.focus();
       }
     },
+    // use this one for indenting one line at a time:
+
+    // indentTextbox(index, pixels, event) {
+    //   const currentIndentation = this.indentations[index];
+    //   const previousIndentation = this.indentations[index - 1];
+    //   // check if tab pressed and current indentation is less than maximum and shift is not pressed
+    //   if (event.keyCode === 9 && !event.shiftKey && currentIndentation < previousIndentation + pixels) {
+    //     // increase indentation by 20px
+    //     this.indentations[index] = currentIndentation + 20;
+    //   }
+    // },
     indentTextbox(index, pixels, event) {
       const currentIndentation = this.indentations[index];
       const previousIndentation = this.indentations[index - 1];
