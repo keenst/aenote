@@ -68,6 +68,16 @@ export default {
       if (event.keyCode === 9 && !event.shiftKey && currentIndentation < previousIndentation + pixels) {
         // increase indentation by 20px
         this.indentations[index] = currentIndentation + 20;
+        // loop through child textboxes and indent them as well
+        for (let i = index + 1; i < this.inputs.length; i++) {
+          const childIndentation = this.indentations[i];
+          if (childIndentation <= currentIndentation) {
+            break;
+          }
+          this.indentations[i] += 20;
+          const inputElement = this.$refs.inputElements[i];
+          inputElement.style.marginLeft = `${this.indentations[i]}px`;
+        }
       }
     },
     unindentTextboxOnBackspace(index, event) {
