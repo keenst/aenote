@@ -1,22 +1,34 @@
 <template>
-  <button @click="this.setNote()">Load</button>
-  <button @click="saveNote(this.inputs)">Save</button>
-  <div class="bg-gray-800 text-cyan-200"> fasfasf
-    <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
-      <input
-        type="text"
-        v-model="input.value"
-        @keydown.enter.prevent="createNewTextbox(index, $event)"
-        @keydown.down.prevent="focusNextTextbox(index)"
-        @keydown.up.prevent="focusPreviousTextbox(index)"
-        @keydown.tab.prevent="indentTextbox(index, 20, $event)"
-        @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
-        @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
-        @focus="newTextboxOnFocus(index)"
-        :style="{ marginLeft: inputs[index].indentation + 'px' }"
-        ref="inputElements"
-        class="bg-gray-100"
-      >
+  <button @click="this.setNotes()">Load</button>
+  <button @click="saveNotes()">Save</button>
+  <div class="flex flex-row">
+    <!-- Sidebar -->
+    <div class="bg-gray-600 w-36 h-screen">
+      <div v-for="(note, index) in notes" :key="index" class="bg-gray-700">
+        <div @click="this.setNote(index)">
+          {{ index }}
+        </div>
+      </div>
+      <div @click="this.createNote()">+</div>
+    </div>
+    <!-- Editor -->
+    <div class="bg-gray-800 text-cyan-200"> fasfasf
+      <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
+        <input
+          type="text"
+          v-model="input.value"
+          @keydown.enter.prevent="createNewTextbox(index, $event)"
+          @keydown.down.prevent="focusNextTextbox(index)"
+          @keydown.up.prevent="focusPreviousTextbox(index)"
+          @keydown.tab.prevent="indentTextbox(index, 20, $event)"
+          @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
+          @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
+          @focus="newTextboxOnFocus(index)"
+          :style="{ marginLeft: inputs[index].indentation + 'px' }"
+          ref="inputElements"
+          class="bg-gray-100"
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +42,8 @@ import { ref, reactive } from 'vue'
 export default {
   data() {
     return {
-      inputs: reactive([{ value: "", indentation: 0 }])
+      inputs: reactive([{ value: "", indentation: 0 }]),
+      notes: reactive([])
     };
   },
   setup() {
@@ -44,63 +57,19 @@ export default {
       return
     }
 
-    const http = new XMLHttpRequest()
-    const url = "http://localhost:1337/users/" + user_id + "/notes/"
-    
-    http.open("GET", url)
-    http.send()
-
-    var firstNoteContent = ref([])
-    var firstNoteId
-    var note
-
-    http.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        const response = JSON.parse(http.responseText)
-        firstNoteContent.value = response[0].content
-        firstNoteId = response[0]._id.$oid
-        //console.log(firstNoteContent)
-      }
-    }
-
-    async function saveNote(note) {
-      const http = new XMLHttpRequest()
-      const url = "http://localhost:1337/notes/" + firstNoteId
-
-      console.log(url)
-
-      http.open("PATCH", url)
-      http.setRequestHeader("content-type", "application/json")
-      
-      const body = { content: note }
-      console.log(body)
-
-      http.send(JSON.stringify(body))
-
-      http.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          console.log(http.responseText)
-          console.log(note)
-        }
-      }
-    }
-
-    async function loadNote() {
+    async function loadNotes() {
       return new Promise(function(resolve, reject) {
         const http = new XMLHttpRequest()
         const url = "http://localhost:1337/users/" + user_id + "/notes/"
 
         http.open("GET", url)
         http.send()
-        
-        var content
 
         http.onreadystatechange = function() {
           if (this.readyState == 4) {
             if (this.status == 200) {
               const response = JSON.parse(http.responseText)
-              const content = response[0].content
-              resolve(content)
+              resolve(response)
             } else {
               reject(new Error("HTTP error " + http.status))
             }
@@ -110,9 +79,8 @@ export default {
     }
 
     return {
-      firstNoteContent,
-      saveNote,
-      loadNote
+      loadNotes,
+      user_id
     }
   },
   methods: {
@@ -207,24 +175,58 @@ export default {
       }
     },
     newTextboxOnFocus(index) {
-      // console.log("getting length, inputs:", this.inputs)
-      // console.log(this.inputs.length)
-      // console.log(this.inputs.value)
-      // console.log("trying setting")
-      // this.inputs = [{value: "test"}]
-      // console.log(this.inputs.value)
-      // console.log(this.inputs)
-      // console.log("tried setting")
       if (index === this.inputs.length - 1) {
         this.inputs.push({ value: "", indentation: 0 });
       }
     },
-    async setNote() {
+    async setNote(index) {
+      this.inputs = this.notes[index].content
+    },
+    async setNotes() {
       try {
-        this.inputs = await this.loadNote()
-        console.log("updated inputs:", this.inputs)
+        this.notes = await this.loadNotes()
       } catch (error) {
-        console.error("Error loading note:", error)
+        console.error("Error loading notes:", error)
+      }
+    },
+    async saveNotes() {
+      this.notes.forEach(note => {
+        const http = new XMLHttpRequest()
+        const url = "http://localhost:1337/notes/" + note._id.$oid
+
+        http.open("PATCH", url)
+        http.setRequestHeader("content-type", "application/json")
+        
+        const body = { content: note.content }
+
+        http.send(JSON.stringify(body))
+
+        http.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            console.log(http.responseText)
+          }
+        }
+      });
+    },
+    async createNote() {
+      const http = new XMLHttpRequest()
+      const url = "http://localhost:1337/notes/"
+
+      http.open("POST", url)
+      http.setRequestHeader("content-type", "application/json")
+      
+      const body = { content: {}, owner_id: { $oid: this.user_id } }
+      console.log(body)
+      console.log(JSON.stringify(body))
+
+      http.send(JSON.stringify(body))
+
+      const self = this
+      http.onreadystatechange = async function() {
+        if (this.readyState == 4 && this.status == 200) {
+          await self.setNotes()
+          await self.setNote(self.notes.length - 1)
+        }
       }
     }
   },
