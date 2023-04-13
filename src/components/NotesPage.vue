@@ -13,7 +13,7 @@
         @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
         @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
         @focus="newTextboxOnFocus(index)"
-        :style="{ marginLeft: indentations[index] + 'px' }"
+        :style="{ marginLeft: inputs[index].indentation + 'px' }"
         ref="inputElements"
         class="bg-gray-100"
       >
@@ -30,8 +30,7 @@ import { ref, reactive } from 'vue'
 export default {
   data() {
     return {
-      inputs: reactive([{ value: "" }]),
-      indentations: [0],
+      inputs: reactive([{ value: "", indentation: 0 }])
     };
   },
   setup() {
@@ -123,9 +122,9 @@ export default {
       // split text into two parts at cursor position
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
-      const currentIndentation = this.indentations[index];
+      const currentIndentation = this.inputs[index].indentation;
       this.inputs[index].value = firstPart;
-      this.inputs.splice(index + 1, 0, { value: secondPart });
+      this.inputs.splice(index + 1, 0, { value: secondPart, indentation: currentIndentation });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
       newInputElement.focus();
@@ -135,10 +134,10 @@ export default {
         newInputElement.selectionEnd = 0;
       }, 0);
       // set the same indentation as the focused input
-      this.indentations.splice(index + 1, 0, currentIndentation);
+      //this.indentations.splice(index + 1, 0, currentIndentation);
       // indent 20px if tab 
       if (event.keyCode === 9) {
-        this.indentations[index + 1] = currentIndentation + 20;
+        this.inputs[index + 1].indentaton = currentIndentation + 20;
       }
     },
     focusNextTextbox(index) {
@@ -165,44 +164,44 @@ export default {
     //   }
     // },
     indentTextbox(index, pixels, event) {
-      const currentIndentation = this.indentations[index];
-      const previousIndentation = this.indentations[index - 1];
+      const currentIndentation = this.inputs[index].indentation;
+      const previousIndentation = this.inputs[index - 1].indentation;
       // check if tab pressed and current indentation is less than maximum and shift is not pressed
       if (event.keyCode === 9 && !event.shiftKey && currentIndentation < previousIndentation + pixels) {
         // increase indentation by 20px
-        this.indentations[index] = currentIndentation + 20;
+        this.inputs[index].indentation = currentIndentation + 20;
         // loop through child textboxes and indent them as well
         for (let i = index + 1; i < this.inputs.length; i++) {
-          const childIndentation = this.indentations[i];
+          const childIndentation = this.inputs[i].indentation;
           if (childIndentation <= currentIndentation) {
             break;
           }
-          this.indentations[i] += 20;
+          this.inputs[i].indentation += 20;
           const inputElement = this.$refs.inputElements[i];
-          inputElement.style.marginLeft = `${this.indentations[i]}px`;
+          inputElement.style.marginLeft = `${this.inputs[i].indentation}px`;
         }
       }
     },
     unindentTextboxOnBackspace(index, event) {
-      const currentIndentation = this.indentations[index];
+      const currentIndentation = this.inputs[index].indentation;
       // checks if start of textbox
       if (event.keyCode === 8 && currentIndentation > 0 && this.$refs.inputElements[index].selectionStart === 0) {
-        this.indentations[index] = currentIndentation - 20;
+        this.inputs[index].indentation = currentIndentation - 20;
         let nextIndex = index + 1;
         // loop through nextindex until it is same or less than current indentation, then unindent all of them
-        while (nextIndex < this.indentations.length && this.indentations[nextIndex] > currentIndentation) {
-          this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
+        while (nextIndex < this.inputs.length && this.inputs[nextIndex].indentation > currentIndentation) {
+          this.inputs[nextIndex].indentation = this.inputs[nextIndex].indentation - 20;
           nextIndex++;
         }
       }
     },
     unindentTextboxOnShiftTab(index, event) {
-      const currentIndentation = this.indentations[index];
+      const currentIndentation = this.inputs[index].indentation;
       if (event.keyCode === 9 && event.shiftKey && currentIndentation > 0) {
-        this.indentations[index] = currentIndentation - 20;
+        this.inputs[index].indentation = currentIndentation - 20;
         let nextIndex = index + 1;
-        while (nextIndex < this.indentations.length && this.indentations[nextIndex] > currentIndentation) {
-          this.indentations[nextIndex] = this.indentations[nextIndex] - 20;
+        while (nextIndex < this.inputs.length && this.inputs[nextIndex].indentation > currentIndentation) {
+          this.inputs[nextIndex].indentation = this.inputs[nextIndex].indentation - 20;
           nextIndex++;
         }
       }
@@ -217,8 +216,7 @@ export default {
       // console.log(this.inputs)
       // console.log("tried setting")
       if (index === this.inputs.length - 1) {
-        this.inputs.push({ value: "" });
-        this.indentations.push(0);
+        this.inputs.push({ value: "", indentation: 0 });
       }
     },
     async setNote() {
