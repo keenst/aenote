@@ -1,33 +1,26 @@
 <template>
-  <div class="bg-ae-grey-700 px-80 py-14">
-    <div class="bg-ae-grey-500 h-full w-full px-20 py-16">
-      <div v-for="(input, index) in inputs" :key="index"> 
-        <div class="relative">
-          <div class="absolute h-4 w-4 bg-ae-grey-700 top-[+4px] left-[-20px]"  @click="TEMPhandleClick"></div>
-          <textarea
-            class="bg-ae-grey-300 text-ae-white font-mono w-full max-w-full h-6 resize-none justify-center mb-0 pl-6"
-            type="text"
-            v-model="input.value"
-            @keydown.enter.prevent="createNewTextbox(index, $event)"
-            @keydown.down.prevent="focusNextTextbox(index)"
-            @keydown.up.prevent="focusPreviousTextbox(index)"
-            @keydown.tab.prevent="indentTextbox(index, 30, $event)"
-            @keydown.backspace="handleBackspacePress(index, $event)"
-            @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
-            @focus="newTextboxOnFocus(index)"
-            :style="{ marginLeft: indentations[index] + 'px', maxWidth: 'calc(100% - ' + indentations[index] + 'px)' }"
-            ref="inputElements"
-          >
-          </textarea>
-        </div>
-      </div>
+  <div class="bg-gray-800 text-cyan-200"> fasfasf
+    <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
+      <input
+        type="text"
+        v-model="input.value"
+        @keydown.enter.prevent="createNewTextbox(index, $event)"
+        @keydown.down.prevent="focusNextTextbox(index)"
+        @keydown.up.prevent="focusPreviousTextbox(index)"
+        @keydown.tab.prevent="indentTextbox(index, 20, $event)"
+        @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
+        @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
+        @focus="newTextboxOnFocus(index)"
+        :style="{ marginLeft: indentations[index] + 'px' }"
+        ref="inputElements"
+        class="bg-gray-100"
+      >
     </div>
   </div>
 </template>
 
 
 <script>
-//           @keydown.tab.prevent="indentTextbox(index, 20, $event); squarePositions[index].left += 30"
 export default {
   data() {
     return {
@@ -131,9 +124,6 @@ export default {
         this.inputs.push({ value: "" });
         this.indentations.push(0);
       }
-    },
-    TEMPhandleClick() {
-      console.log('Div clicked!');
     },
   },
 };
