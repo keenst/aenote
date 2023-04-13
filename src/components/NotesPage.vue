@@ -1,5 +1,5 @@
 <template>
-  <button @click="this.inputs = setNote()">Load</button>
+  <button @click="this.inputs = loadNote()">Load</button>
   <button @click="saveNote(this.inputs)">Save</button>
   <div class="bg-gray-800 text-cyan-200"> fasfasf
     <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
