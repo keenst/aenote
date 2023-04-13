@@ -118,14 +118,14 @@ export default {
   },
   methods: {
     createNewTextbox(index, event) {
-      const value = event.target.value;
+      const value = event.target;
       const cursorPos = event.target.selectionStart;
       // split text into two parts at cursor position
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
       const currentIndentation = this.indentations[index];
-      this.inputs.value[index].value = firstPart;
-      this.inputs.value.splice(index + 1, 0, { value: secondPart });
+      this.inputs[index].value = firstPart;
+      this.inputs.splice(index + 1, 0, { value: secondPart });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
       newInputElement.focus();
@@ -142,7 +142,7 @@ export default {
       }
     },
     focusNextTextbox(index) {
-      if (index < this.inputs.value.length - 1) {
+      if (index < this.inputs.length - 1) {
         const nextInputElement = this.$refs.inputElements[index + 1];
         nextInputElement.focus();
       }
@@ -172,7 +172,7 @@ export default {
         // increase indentation by 20px
         this.indentations[index] = currentIndentation + 20;
         // loop through child textboxes and indent them as well
-        for (let i = index + 1; i < this.inputs.value.length; i++) {
+        for (let i = index + 1; i < this.inputs.length; i++) {
           const childIndentation = this.indentations[i];
           if (childIndentation <= currentIndentation) {
             break;
