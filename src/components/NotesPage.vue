@@ -1,8 +1,6 @@
 <template>
-<<<<<<< HEAD
-=======
-  <button @click="this.inputs = firstNoteContent">Load</button>
->>>>>>> parent of 1da9aba (Merge pull request #4 from keenst/mango-on-fork)
+  <button @click="this.setNote()">Load</button>
+  <button @click="saveNote(this.inputs)">Save</button>
   <div class="bg-gray-800 text-cyan-200"> fasfasf
     <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
       <input
@@ -25,57 +23,99 @@
 
 
 <script>
-<<<<<<< HEAD
-export default {
-  data() {
-    return {
-      inputs: [{ value: "" }],
-      indentations: [0],
-    };
-  },
-=======
 
 import { useUserStore } from '../stores/userStore'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 export default {
   data() {
     return {
-      inputs: ref([{ value: "" }]),
+      inputs: reactive([{ value: "" }]),
       indentations: [0],
     };
   },
   setup() {
     const store = useUserStore()
-    
+
     console.log("ID:", store.user_id)
 
-    if (store.user_id.$oid == null) {
+    const user_id = store.user_id.$oid
+    if (user_id == null) {
       console.log("User is not logged in!")
       return
     }
 
-    const Http = new XMLHttpRequest()
-    const url = "http://localhost:1337/users/" + store.user_id.$oid + "/notes/"
+    const http = new XMLHttpRequest()
+    const url = "http://localhost:1337/users/" + user_id + "/notes/"
     
-    Http.open("GET", url)
-    Http.send()
+    http.open("GET", url)
+    http.send()
 
     var firstNoteContent = ref([])
+    var firstNoteId
+    var note
 
-    Http.onreadystatechange = function() {
+    http.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        const response = JSON.parse(Http.responseText)
+        const response = JSON.parse(http.responseText)
         firstNoteContent.value = response[0].content
-        console.log(firstNoteContent)
+        firstNoteId = response[0]._id.$oid
+        //console.log(firstNoteContent)
       }
     }
 
+    async function saveNote(note) {
+      const http = new XMLHttpRequest()
+      const url = "http://localhost:1337/notes/" + firstNoteId
+
+      console.log(url)
+
+      http.open("PATCH", url)
+      http.setRequestHeader("content-type", "application/json")
+      
+      const body = { content: note }
+      console.log(body)
+
+      http.send(JSON.stringify(body))
+
+      http.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log(http.responseText)
+          console.log(note)
+        }
+      }
+    }
+
+    async function loadNote() {
+      return new Promise(function(resolve, reject) {
+        const http = new XMLHttpRequest()
+        const url = "http://localhost:1337/users/" + user_id + "/notes/"
+
+        http.open("GET", url)
+        http.send()
+        
+        var content
+
+        http.onreadystatechange = function() {
+          if (this.readyState == 4) {
+            if (this.status == 200) {
+              const response = JSON.parse(http.responseText)
+              const content = response[0].content
+              resolve(content)
+            } else {
+              reject(new Error("HTTP error " + http.status))
+            }
+          }
+        }
+      })
+    }
+
     return {
-      firstNoteContent
+      firstNoteContent,
+      saveNote,
+      loadNote
     }
   },
->>>>>>> parent of 1da9aba (Merge pull request #4 from keenst/mango-on-fork)
   methods: {
     createNewTextbox(index, event) {
       const value = event.target.value;
@@ -84,8 +124,8 @@ export default {
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
       const currentIndentation = this.indentations[index];
-      this.inputs[index].value = firstPart;
-      this.inputs.splice(index + 1, 0, { value: secondPart });
+      this.inputs.value[index].value = firstPart;
+      this.inputs.value.splice(index + 1, 0, { value: secondPart });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
       newInputElement.focus();
@@ -102,7 +142,7 @@ export default {
       }
     },
     focusNextTextbox(index) {
-      if (index < this.inputs.length - 1) {
+      if (index < this.inputs.value.length - 1) {
         const nextInputElement = this.$refs.inputElements[index + 1];
         nextInputElement.focus();
       }
@@ -132,7 +172,7 @@ export default {
         // increase indentation by 20px
         this.indentations[index] = currentIndentation + 20;
         // loop through child textboxes and indent them as well
-        for (let i = index + 1; i < this.inputs.length; i++) {
+        for (let i = index + 1; i < this.inputs.value.length; i++) {
           const childIndentation = this.indentations[i];
           if (childIndentation <= currentIndentation) {
             break;
@@ -168,11 +208,27 @@ export default {
       }
     },
     newTextboxOnFocus(index) {
+      // console.log("getting length, inputs:", this.inputs)
+      // console.log(this.inputs.length)
+      // console.log(this.inputs.value)
+      // console.log("trying setting")
+      // this.inputs = [{value: "test"}]
+      // console.log(this.inputs.value)
+      // console.log(this.inputs)
+      // console.log("tried setting")
       if (index === this.inputs.length - 1) {
         this.inputs.push({ value: "" });
         this.indentations.push(0);
       }
     },
+    async setNote() {
+      try {
+        this.inputs = await this.loadNote()
+        console.log("updated inputs:", this.inputs)
+      } catch (error) {
+        console.error("Error loading note:", error)
+      }
+    }
   },
 };
 </script>
