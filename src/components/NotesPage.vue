@@ -1,15 +1,26 @@
 <template>
   <button @click="this.setNotes()">Load</button>
   <button @click="saveNotes()">Save</button>
-  <div class="flex flex-row">
+  <div class="flex flex-row h-full">
     <!-- Sidebar -->
-    <div class="bg-gray-600 w-36 h-screen">
-      <div v-for="(note, index) in notes" :key="index" class="bg-gray-700">
-        <div @click="this.setNote(index)">
-          {{ index }}
+    <div class="bg-gray-700 w-36 p-2 flex flex-col justify-between relative">
+      <div class="space-y-1">
+        <div v-for="(note, index) in notes" :key="index">
+          <div @click="this.setNote(index); this.selectedNote = index" 
+          class="rounded-md min-w-[24px] w-min cursor-pointer"
+          :class="
+          {[`hover:bg-gray-600 text-gray-400`]: index != selectedNote},
+          {[`bg-gray-500 text-gray-700 font-bold`]: index == selectedNote}
+          ">
+            <p class="ml-2 mr-2">{{ index }}</p>
+          </div>
         </div>
       </div>
-      <div @click="this.createNote()">+</div>
+      <div @click="this.createNote()" class="
+      rounded-md mb-6 p-1 bg-gray-800 w-full cursor-pointer justify-items-center grid text-gray-400
+      hover:bg-gray-900">
+        <p class="">Create new</p>
+      </div>
     </div>
     <!-- Editor -->
     <div class="bg-gray-800 text-cyan-200"> fasfasf
@@ -43,7 +54,8 @@ export default {
   data() {
     return {
       inputs: reactive([{ value: "", indentation: 0 }]),
-      notes: reactive([])
+      notes: reactive([]),
+      selectedNote: 0
     };
   },
   setup() {
@@ -215,7 +227,7 @@ export default {
       http.open("POST", url)
       http.setRequestHeader("content-type", "application/json")
       
-      const body = { content: {}, owner_id: { $oid: this.user_id } }
+      const body = { owner_id: { $oid: this.user_id } }
       console.log(body)
       console.log(JSON.stringify(body))
 
