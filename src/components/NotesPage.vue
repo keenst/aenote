@@ -1,114 +1,39 @@
 <template>
-  <div class="bg-gray-800 text-cyan-200"> fasfasf
-    <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
-      <input
-        type="text"
-        v-model="input.value"
-        @keydown.enter.prevent="createNewTextbox(index, $event)"
-        @keydown.down.prevent="focusNextTextbox(index)"
-        @keydown.up.prevent="focusPreviousTextbox(index)"
-        @keydown.tab.prevent="indentTextbox(index, 20, $event)"
-        @keydown.backspace="unindentTextboxOnBackspace(index, $event)"
-        @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
-        @focus="newTextboxOnFocus(index)"
-        :style="{ marginLeft: indentations[index] + 'px' }"
-        ref="inputElements"
-        class="bg-gray-100"
-      >
+  <div class="bg-ae-grey-700 px-80 py-14">
+    <div class="bg-ae-grey-500 h-full w-full px-20 py-16">
+      <div v-for="(input, index) in inputs" :key="index"> 
+        <div class="relative">
+          <div class="absolute h-4 w-4 bg-ae-grey-700 top-[+4px] left-[-20px]"  @click="TEMPhandleClick"></div>
+          <textarea
+            class="bg-ae-grey-300 text-ae-white font-mono w-full max-w-full h-6 resize-none justify-center mb-0 pl-6"
+            type="text"
+            v-model="input.value"
+            @keydown.enter.prevent="createNewTextbox(index, $event)"
+            @keydown.down.prevent="focusNextTextbox(index)"
+            @keydown.up.prevent="focusPreviousTextbox(index)"
+            @keydown.tab.prevent="indentTextbox(index, 30, $event)"
+            @keydown.backspace="handleBackspacePress(index, $event)"
+            @keydown.shift.tab.prevent="unindentTextboxOnShiftTab(index, $event)"
+            @focus="newTextboxOnFocus(index)"
+            :style="{ marginLeft: indentations[index] + 'px', maxWidth: 'calc(100% - ' + indentations[index] + 'px)' }"
+            ref="inputElements"
+          >
+          </textarea>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 
 <script>
+//           @keydown.tab.prevent="indentTextbox(index, 20, $event); squarePositions[index].left += 30"
 export default {
   data() {
     return {
-      inputs: reactive([{ value: "" }]),
+      inputs: [{ value: "" }],
       indentations: [0],
     };
-  },
-  setup() {
-    const store = useUserStore()
-
-    console.log("ID:", store.user_id)
-
-    const user_id = store.user_id.$oid
-    if (user_id == null) {
-      console.log("User is not logged in!")
-      return
-    }
-
-    const http = new XMLHttpRequest()
-    const url = "http://localhost:1337/users/" + user_id + "/notes/"
-    
-    http.open("GET", url)
-    http.send()
-
-    var firstNoteContent = ref([])
-    var firstNoteId
-    var note
-
-    http.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        const response = JSON.parse(http.responseText)
-        firstNoteContent.value = response[0].content
-        firstNoteId = response[0]._id.$oid
-        //console.log(firstNoteContent)
-      }
-    }
-
-    async function saveNote(note) {
-      const http = new XMLHttpRequest()
-      const url = "http://localhost:1337/notes/" + firstNoteId
-
-      console.log(url)
-
-      http.open("PATCH", url)
-      http.setRequestHeader("content-type", "application/json")
-      
-      const body = { content: note }
-      console.log(body)
-
-      http.send(JSON.stringify(body))
-
-      http.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          console.log(http.responseText)
-          console.log(note)
-        }
-      }
-    }
-
-    async function loadNote() {
-      return new Promise(function(resolve, reject) {
-        const http = new XMLHttpRequest()
-        const url = "http://localhost:1337/users/" + user_id + "/notes/"
-
-        http.open("GET", url)
-        http.send()
-        
-        var content
-
-        http.onreadystatechange = function() {
-          if (this.readyState == 4) {
-            if (this.status == 200) {
-              const response = JSON.parse(http.responseText)
-              const content = response[0].content
-              resolve(content)
-            } else {
-              reject(new Error("HTTP error " + http.status))
-            }
-          }
-        }
-      })
-    }
-
-    return {
-      firstNoteContent,
-      saveNote,
-      loadNote
-    }
   },
   methods: {
     createNewTextbox(index, event) {
@@ -118,8 +43,8 @@ export default {
       const firstPart = value.slice(0, cursorPos);
       const secondPart = value.slice(cursorPos);
       const currentIndentation = this.indentations[index];
-      this.inputs.value[index].value = firstPart;
-      this.inputs.value.splice(index + 1, 0, { value: secondPart });
+      this.inputs[index].value = firstPart;
+      this.inputs.splice(index + 1, 0, { value: secondPart });
       // focus on new input
       const newInputElement = this.$refs.inputElements[index + 1];
       newInputElement.focus();
@@ -136,7 +61,7 @@ export default {
       }
     },
     focusNextTextbox(index) {
-      if (index < this.inputs.value.length - 1) {
+      if (index < this.inputs.length - 1) {
         const nextInputElement = this.$refs.inputElements[index + 1];
         nextInputElement.focus();
       }
@@ -166,7 +91,7 @@ export default {
         // increase indentation by 20px
         this.indentations[index] = currentIndentation + 20;
         // loop through child textboxes and indent them as well
-        for (let i = index + 1; i < this.inputs.value.length; i++) {
+        for (let i = index + 1; i < this.inputs.length; i++) {
           const childIndentation = this.indentations[i];
           if (childIndentation <= currentIndentation) {
             break;
@@ -202,18 +127,13 @@ export default {
       }
     },
     newTextboxOnFocus(index) {
-      // console.log("getting length, inputs:", this.inputs)
-      // console.log(this.inputs.length)
-      // console.log(this.inputs.value)
-      // console.log("trying setting")
-      // this.inputs = [{value: "test"}]
-      // console.log(this.inputs.value)
-      // console.log(this.inputs)
-      // console.log("tried setting")
       if (index === this.inputs.length - 1) {
         this.inputs.push({ value: "" });
         this.indentations.push(0);
       }
+    },
+    TEMPhandleClick() {
+      console.log('Div clicked!');
     },
   },
 };
