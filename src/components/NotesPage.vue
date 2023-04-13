@@ -1,4 +1,8 @@
 <template>
+<<<<<<< HEAD
+=======
+  <button @click="this.inputs = firstNoteContent">Load</button>
+>>>>>>> parent of 1da9aba (Merge pull request #4 from keenst/mango-on-fork)
   <div class="bg-gray-800 text-cyan-200"> fasfasf
     <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
       <input
@@ -21,6 +25,7 @@
 
 
 <script>
+<<<<<<< HEAD
 export default {
   data() {
     return {
@@ -28,6 +33,49 @@ export default {
       indentations: [0],
     };
   },
+=======
+
+import { useUserStore } from '../stores/userStore'
+import { ref } from 'vue'
+
+export default {
+  data() {
+    return {
+      inputs: ref([{ value: "" }]),
+      indentations: [0],
+    };
+  },
+  setup() {
+    const store = useUserStore()
+    
+    console.log("ID:", store.user_id)
+
+    if (store.user_id.$oid == null) {
+      console.log("User is not logged in!")
+      return
+    }
+
+    const Http = new XMLHttpRequest()
+    const url = "http://localhost:1337/users/" + store.user_id.$oid + "/notes/"
+    
+    Http.open("GET", url)
+    Http.send()
+
+    var firstNoteContent = ref([])
+
+    Http.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        const response = JSON.parse(Http.responseText)
+        firstNoteContent.value = response[0].content
+        console.log(firstNoteContent)
+      }
+    }
+
+    return {
+      firstNoteContent
+    }
+  },
+>>>>>>> parent of 1da9aba (Merge pull request #4 from keenst/mango-on-fork)
   methods: {
     createNewTextbox(index, event) {
       const value = event.target.value;
