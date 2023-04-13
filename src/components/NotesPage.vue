@@ -1,5 +1,5 @@
 <template>
-  <button @click="this.setNote()">Load</button>
+  <button @click="this.inputs = setNote()">Load</button>
   <button @click="saveNote(this.inputs)">Save</button>
   <div class="bg-gray-800 text-cyan-200"> fasfasf
     <div v-for="(input, index) in inputs" :key="index" class="bg-gray-800">
@@ -219,14 +219,6 @@ export default {
       if (index === this.inputs.length - 1) {
         this.inputs.push({ value: "" });
         this.indentations.push(0);
-      }
-    },
-    async setNote() {
-      try {
-        this.inputs = await this.loadNote()
-        console.log("updated inputs:", this.inputs)
-      } catch (error) {
-        console.error("Error loading note:", error)
       }
     }
   },
