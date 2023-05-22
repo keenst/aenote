@@ -12,7 +12,7 @@
       <button type="submit">Login</button>
       <div @click="hasAccount = false" class="text-gray-400 text-xs">Don't have an account?</div>
     </form>
-    <form v-else @submit.prevent="" class="space-y-2">
+    <form v-else @submit.prevent="createAccount(username, password)" class="space-y-2">
       <div>
         <label for="username">Username:</label>
         <input type="text" id="username" v-model="username">
@@ -29,10 +29,8 @@
 
 <script lang="ts">
 
-import { ref } from 'vue'
 import router from '../router'
 import { useUserStore } from '../stores/userStore'
-import { RouteLocationRaw } from 'vue-router'
 
 export default {
   data() {
@@ -47,32 +45,62 @@ export default {
     const store = useUserStore()
 
     async function login(username: String, password: String) {
-      const Http = new XMLHttpRequest()
-      const url = "http://localhost:1337/auth/"
-      const body: any = 
-      {
+      const body: any = {
         "username": username,
         "password": password
       }
 
-      Http.open("POST", url)
-      Http.setRequestHeader('Content-Type', 'application/json')
-      
-      Http.send(JSON.stringify(body))
-      
-      Http.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          const response = JSON.parse(Http.responseText)
-          console.log(response._id)
-          store.user_id = response._id
-          console.log(store.user_id)
-          router.push('/notes')
-        }
+      try {
+        const response = await postRequest("http://localhost:1337/auth/", body)
+        store.user_id = response._id
+        router.push('/notes')
+
+      } catch (error) {
+        console.error("Error logging in:", error)
+        return
       }
     }
 
+    async function createAccount(username: String, password: String) {
+      const body: any = {
+        "username": username,
+        "password": password
+      }
+
+      try {
+        await postRequest("http://localhost:1337/users/", body)
+        login(username, password)
+      } catch (error) {
+        console.error("Error creating account:", error)
+      }
+    }
+
+    async function postRequest(url: string | URL, body: any): Promise<any> {
+      return new Promise(function(resolve, reject) {
+        const Http = new XMLHttpRequest()
+        
+        Http.open("POST", url)
+        Http.setRequestHeader('Content-Type', 'application/json')
+
+        Http.send(JSON.stringify(body))
+
+        Http.onreadystatechange = function() {
+          if (this.readyState == 4) {
+            if (this.status == 200) {
+              const response = JSON.parse(Http.responseText)
+              resolve(response)
+            }
+            else {
+              reject(new Error("HTTP error " + this.status))
+            }
+          }
+        }
+      })
+    }
+
     return {
-      login
+      login,
+      createAccount
     }
   }
 }
